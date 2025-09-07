@@ -12,7 +12,7 @@ const UserProfile = (props) => {
       backgroundColor: '#ffffff'
     }}>
       <h2 style={{
-        color: '#1a237e',
+        color: 'blue',  
         marginTop: '0',
         borderBottom: '2px solid #e8eaf6',
         paddingBottom: '10px'
