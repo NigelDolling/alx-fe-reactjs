@@ -3,6 +3,7 @@ import { create } from 'zustand';
 const useRecipeStore = create((set, get) => ({
   recipes: [],
   favorites: JSON.parse(localStorage.getItem('favorites') || '[]'),
+  recommendations: [], // Added recommendations array to store recommended recipes
   searchTerm: '',
   searchField: 'title', // Default search field
   filters: {
@@ -76,37 +77,87 @@ const useRecipeStore = create((set, get) => ({
       .map(({ _score, ...recipe }) => recipe); // Remove the temporary _score property
   },
   
-  // Actions
-  setSearchTerm: (term) => set({ searchTerm: term }),
-  setSearchField: (field) => set({ searchField: field }),
-  setFilter: (filter, value) => set(state => ({
-    filters: { ...state.filters, [filter]: value }
-  })),
-  addIngredientFilter: (ingredient) => set(state => ({
-    filters: {
-      ...state.filters,
-      ingredients: [...new Set([...state.filters.ingredients, ingredient])]
+  // Actions to update recommendations
+  updateRecommendations: () => set((state) => {
+    const { recipes, favorites } = state;
+    
+    if (favorites.length === 0) {
+      return {
+        recommendations: [...recipes]
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 3)
+      };
     }
-  })),
-  removeIngredientFilter: (ingredient) => set(state => ({
-    filters: {
-      ...state.filters,
-      ingredients: state.filters.ingredients.filter(i => i !== ingredient)
-    }
-  })),
+
+    const favoriteTags = new Set();
+    recipes.forEach(recipe => {
+      if (favorites.includes(recipe.id) && recipe.ingredients) {
+        recipe.ingredients.forEach(ing => favoriteTags.add(ing.toLowerCase()));
+      }
+    });
+
+    const recommendations = recipes
+      .filter(recipe => !favorites.includes(recipe.id))
+      .map(recipe => {
+        let score = 0;
+        if (recipe.ingredients) {
+          score = recipe.ingredients.reduce((acc, ing) => 
+            favoriteTags.has(ing.toLowerCase()) ? acc + 1 : acc, 0);
+        }
+        return { ...recipe, _score: score };
+      })
+      .sort((a, b) => b._score - a._score)
+      .slice(0, 3)
+      .map(({ _score, ...recipe }) => recipe);
+
+    return { recommendations };
+  }),
   
-  // Favorites actions
+  // Update other actions to also update recommendations when needed
   toggleFavorite: (recipeId) => set((state) => {
     const isFavorite = state.favorites.includes(recipeId);
     const newFavorites = isFavorite
       ? state.favorites.filter(id => id !== recipeId)
       : [...state.favorites, recipeId];
     
-    // Save to localStorage
     localStorage.setItem('favorites', JSON.stringify(newFavorites));
     
-    return { favorites: newFavorites };
+    // Update recommendations after changing favorites
+    const { recipes } = state;
+    if (newFavorites.length === 0) {
+      return {
+        favorites: newFavorites,
+        recommendations: [...recipes]
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 3)
+      };
+    }
+
+    const favoriteTags = new Set();
+    recipes.forEach(recipe => {
+      if (newFavorites.includes(recipe.id) && recipe.ingredients) {
+        recipe.ingredients.forEach(ing => favoriteTags.add(ing.toLowerCase()));
+      }
+    });
+
+    const recommendations = recipes
+      .filter(recipe => !newFavorites.includes(recipe.id))
+      .map(recipe => {
+        let score = 0;
+        if (recipe.ingredients) {
+          score = recipe.ingredients.reduce((acc, ing) => 
+            favoriteTags.has(ing.toLowerCase()) ? acc + 1 : acc, 0);
+        }
+        return { ...recipe, _score: score };
+      })
+      .sort((a, b) => b._score - a._score)
+      .slice(0, 3)
+      .map(({ _score, ...recipe }) => recipe);
+
+    return { favorites: newFavorites, recommendations };
   }),
+  
+  // Favorites actions
   isFavorite: (recipeId) => get().favorites.includes(recipeId),
   getFavoriteRecipes: () => {
     const { recipes, favorites } = get();
@@ -137,6 +188,25 @@ const useRecipeStore = create((set, get) => ({
     })),
   getRecipe: (id) => get().recipes.find((recipe) => recipe.id === id),
   setRecipes: (recipes) => set({ recipes }),
+  
+  // Other actions
+  setSearchTerm: (term) => set({ searchTerm: term }),
+  setSearchField: (field) => set({ searchField: field }),
+  setFilter: (filter, value) => set(state => ({
+    filters: { ...state.filters, [filter]: value }
+  })),
+  addIngredientFilter: (ingredient) => set(state => ({
+    filters: {
+      ...state.filters,
+      ingredients: [...new Set([...state.filters.ingredients, ingredient])]
+    }
+  })),
+  removeIngredientFilter: (ingredient) => set(state => ({
+    filters: {
+      ...state.filters,
+      ingredients: state.filters.ingredients.filter(i => i !== ingredient)
+    }
+  })),
 }));
 
 export default useRecipeStore;
