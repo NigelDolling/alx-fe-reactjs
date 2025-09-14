@@ -1,0 +1,125 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import useRecipeStore from './recipeStore';
+
+const FavoritesList = () => {
+  const favorites = useRecipeStore((state) => state.getFavoriteRecipes());
+  const toggleFavorite = useRecipeStore((state) => state.toggleFavorite);
+  const isFavorite = useRecipeStore((state) => state.isFavorite);
+
+  if (favorites.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <svg
+          className="mx-auto h-12 w-12 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1}
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+          />
+        </svg>
+        <h3 className="mt-2 text-sm font-medium text-gray-900">No favorites yet</h3>
+        <p className="mt-1 text-sm text-gray-500">
+          Save your favorite recipes to see them here.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">My Favorites</h2>
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          {favorites.length} {favorites.length === 1 ? 'recipe' : 'recipes'}
+        </span>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {favorites.map((recipe) => (
+          <div 
+            key={recipe.id} 
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full border-2 border-blue-100"
+          >
+            <div className="p-6 flex-1 flex flex-col">
+              <div className="flex justify-between items-start">
+                <h3 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-2">
+                  <Link 
+                    to={`/recipes/${recipe.id}`}
+                    className="hover:text-blue-600 transition-colors"
+                  >
+                    {recipe.title}
+                  </Link>
+                </h3>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleFavorite(recipe.id);
+                  }}
+                  className={`p-1 rounded-full ${isFavorite(recipe.id) ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-gray-500'}`}
+                  aria-label={isFavorite(recipe.id) ? 'Remove from favorites' : 'Add to favorites'}
+                >
+                  <svg
+                    className="h-6 w-6"
+                    fill={isFavorite(recipe.id) ? 'currentColor' : 'none'}
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+              </div>
+              
+              {recipe.description && (
+                <p className="text-gray-600 mb-4 line-clamp-3 flex-1">
+                  {recipe.description}
+                </p>
+              )}
+              
+              <div className="mt-auto pt-4 border-t border-gray-100">
+                <div className="flex justify-between items-center">
+                  <Link 
+                    to={`/recipes/${recipe.id}`}
+                    className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                  >
+                    View Recipe →
+                  </Link>
+                  
+                  <div className="flex items-center space-x-2">
+                    {recipe.prepTime && (
+                      <span className="flex items-center text-xs text-gray-500">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {recipe.prepTime} min
+                      </span>
+                    )}
+                    {recipe.difficulty && (
+                      <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">
+                        {recipe.difficulty}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default FavoritesList;

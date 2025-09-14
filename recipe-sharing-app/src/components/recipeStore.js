@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 const useRecipeStore = create((set, get) => ({
   recipes: [],
+  favorites: JSON.parse(localStorage.getItem('favorites') || '[]'),
   searchTerm: '',
   searchField: 'title', // Default search field
   filters: {
@@ -42,6 +43,38 @@ const useRecipeStore = create((set, get) => ({
       return matchesSearch && matchesPrepTime && matchesDifficulty && matchesIngredients;
     });
   },
+
+  // Get recommended recipes based on favorites
+  get recommendedRecipes() {
+    const { recipes, favorites } = get();
+    if (favorites.length === 0) {
+      // If no favorites, return some random recipes
+      return [...recipes].sort(() => 0.5 - Math.random()).slice(0, 3);
+    }
+
+    // Get all tags from favorite recipes
+    const favoriteTags = new Set();
+    recipes.forEach(recipe => {
+      if (favorites.includes(recipe.id) && recipe.ingredients) {
+        recipe.ingredients.forEach(ing => favoriteTags.add(ing.toLowerCase()));
+      }
+    });
+
+    // Find recipes with matching tags that aren't already favorites
+    return recipes
+      .filter(recipe => !favorites.includes(recipe.id))
+      .map(recipe => {
+        let score = 0;
+        if (recipe.ingredients) {
+          score = recipe.ingredients.reduce((acc, ing) => 
+            favoriteTags.has(ing.toLowerCase()) ? acc + 1 : acc, 0);
+        }
+        return { ...recipe, _score: score };
+      })
+      .sort((a, b) => b._score - a._score)
+      .slice(0, 3)
+      .map(({ _score, ...recipe }) => recipe); // Remove the temporary _score property
+  },
   
   // Actions
   setSearchTerm: (term) => set({ searchTerm: term }),
@@ -62,6 +95,24 @@ const useRecipeStore = create((set, get) => ({
     }
   })),
   
+  // Favorites actions
+  toggleFavorite: (recipeId) => set((state) => {
+    const isFavorite = state.favorites.includes(recipeId);
+    const newFavorites = isFavorite
+      ? state.favorites.filter(id => id !== recipeId)
+      : [...state.favorites, recipeId];
+    
+    // Save to localStorage
+    localStorage.setItem('favorites', JSON.stringify(newFavorites));
+    
+    return { favorites: newFavorites };
+  }),
+  isFavorite: (recipeId) => get().favorites.includes(recipeId),
+  getFavoriteRecipes: () => {
+    const { recipes, favorites } = get();
+    return recipes.filter(recipe => favorites.includes(recipe.id));
+  },
+  
   // Original recipe actions
   addRecipe: (newRecipe) => 
     set((state) => ({
@@ -75,6 +126,8 @@ const useRecipeStore = create((set, get) => ({
   deleteRecipe: (id) =>
     set((state) => ({
       recipes: state.recipes.filter((recipe) => recipe.id !== id),
+      // Remove from favorites if it was favorited
+      favorites: state.favorites.filter(favId => favId !== id)
     })),
   updateRecipe: (id, updatedRecipe) =>
     set((state) => ({
