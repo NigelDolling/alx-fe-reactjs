@@ -11,8 +11,8 @@ const EditRecipeForm = ({ recipe, onSuccess }) => {
     setDescription(recipe.description);
   }, [recipe]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
     if (!title.trim() || !description.trim()) return;
     
     updateRecipe(recipe.id, {
@@ -33,7 +33,7 @@ const EditRecipeForm = ({ recipe, onSuccess }) => {
           type="text"
           id="edit-title"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(event) => setTitle(event.target.value)}
           placeholder="Enter recipe title"
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           required
@@ -46,7 +46,7 @@ const EditRecipeForm = ({ recipe, onSuccess }) => {
         <textarea
           id="edit-description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(event) => setDescription(event.target.value)}
           placeholder="Enter recipe description"
           rows={5}
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
