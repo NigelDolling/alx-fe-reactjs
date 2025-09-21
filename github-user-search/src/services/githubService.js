@@ -43,3 +43,6 @@ export const getUserRepos = async (username) => {
     throw error;
   }
 };
+
+// Alias to match requested function name in the task description
+export const fetchUserData = searchUser;

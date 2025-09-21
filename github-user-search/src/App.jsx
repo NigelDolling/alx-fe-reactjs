@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { searchUser } from './services/githubService';
-import SearchBar from './components/SearchBar';
+import { fetchUserData } from './services/githubService';
+import SearchBar from './components/Search';
 import UserCard from './components/UserCard';
 import './App.css';
 
@@ -14,10 +14,10 @@ function App() {
     setError(null);
     
     try {
-      const userData = await searchUser(username);
+      const userData = await fetchUserData(username);
       setUser(userData);
     } catch (err) {
-      setError('User not found. Please try another username.');
+      setError('Looks like we cant find the user');
       setUser(null);
     } finally {
       setLoading(false);
