@@ -15,9 +15,7 @@ const api = axios.create({
 });
 
 /**
- * Search for a GitHub user by username
- * @param {string} username - GitHub username to search for
- * @returns {Promise<Object>} - User data from GitHub API
+ * Search for a GitHub user by username (basic profile)
  */
 export const searchUser = async (username) => {
   try {
@@ -31,8 +29,6 @@ export const searchUser = async (username) => {
 
 /**
  * Get user repositories
- * @param {string} username - GitHub username
- * @returns {Promise<Array>} - Array of user repositories
  */
 export const getUserRepos = async (username) => {
   try {
@@ -46,3 +42,65 @@ export const getUserRepos = async (username) => {
 
 // Alias to match requested function name in the task description
 export const fetchUserData = searchUser;
+
+/**
+ * Build a GitHub Search API query string from parameters
+ * @param {Object} params
+ * @param {string} [params.username]
+ * @param {string} [params.location]
+ * @param {number} [params.minRepos]
+ * @returns {string}
+ */
+const buildSearchQuery = ({ username = '', location = '', minRepos } = {}) => {
+  const parts = [];
+  if (username) parts.push(`${username}`);
+  if (location) parts.push(`location:${JSON.stringify(location)}`);
+  if (typeof minRepos === 'number' && !Number.isNaN(minRepos)) parts.push(`repos:>=${minRepos}`);
+  // Join with spaces; GitHub treats spaces as AND
+  return parts.join(' ').trim() || 'type:user';
+};
+
+/**
+ * Advanced user search using GitHub Search API with pagination
+ * Returns minimal user list from search (login, avatar_url, html_url) and total_count
+ * @param {Object} options
+ * @param {string} [options.username]
+ * @param {string} [options.location]
+ * @param {number} [options.minRepos]
+ * @param {number} [options.page]
+ * @param {number} [options.per_page]
+ */
+export const searchUsersAdvanced = async ({ username, location, minRepos, page = 1, per_page = 10 } = {}) => {
+  try {
+    const q = buildSearchQuery({ username, location, minRepos });
+    const response = await api.get('/search/users', {
+      params: { q, page, per_page },
+    });
+    return response.data; // { total_count, incomplete_results, items: [...] }
+  } catch (error) {
+    console.error('Error searching users:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch full user profile by login (to get location, public_repos, etc.)
+ */
+export const getUserByLogin = async (login) => {
+  try {
+    const response = await api.get(`/users/${login}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching user by login ${login}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch full profiles for a list of logins in parallel
+ * Be mindful of rate limits for large lists.
+ */
+export const getUsersDetails = async (logins = []) => {
+  const requests = logins.map((login) => getUserByLogin(login));
+  return Promise.all(requests);
+};
