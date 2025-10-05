@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "title": "Spaghetti Carbonara",
+    "summary": "A classic Italian pasta dish with eggs, cheese, bacon, and black pepper.",
+    "image": "https://images.unsplash.com/photo-1604908176997-4312f3f1d8d3?q=80&w=1200&auto=format&fit=crop"
+  },
+  {
+    "id": 2,
+    "title": "Chicken Tikka Masala",
+    "summary": "Chunks of grilled chicken (tikka) cooked in a smooth buttery & creamy tomato based gravy.",
+    "image": "https://images.unsplash.com/photo-1604908554155-112c88fa79c5?q=80&w=1200&auto=format&fit=crop"
+  },
+  {
+    "id": 3,
+    "title": "Avocado Toast",
+    "summary": "Toasted sourdough topped with smashed avocado, chili flakes, and a squeeze of lemon.",
+    "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=1200&auto=format&fit=crop"
+  },
+  {
+    "id": 4,
+    "title": "Berry Smoothie Bowl",
+    "summary": "A refreshing blend of mixed berries topped with granola and coconut flakes.",
+    "image": "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?q=80&w=1200&auto=format&fit=crop"
+  },
+  {
+    "id": 5,
+    "title": "Grilled Salmon",
+    "summary": "Perfectly grilled salmon fillet with herbs and lemon butter sauce.",
+    "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1200&auto=format&fit=crop"
+  },
+  {
+    "id": 6,
+    "title": "Veggie Buddha Bowl",
+    "summary": "Colorful bowl of quinoa, roasted veggies, chickpeas, and tahini dressing.",
+    "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1200&auto=format&fit=crop"
+  }
+]
