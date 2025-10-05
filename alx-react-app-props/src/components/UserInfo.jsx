@@ -5,4 +5,3 @@ function UserInfo({ name, email }) {
 }
 
 export default UserInfo;
-ggg
