@@ -1,6 +1,7 @@
 import { useState, createContext, useContext } from 'react'
 import { BrowserRouter, Routes, Route, Link, Navigate, Outlet, useParams } from 'react-router-dom'
 import './App.css'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 const AuthContext = createContext(null)
 
