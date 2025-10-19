@@ -12,6 +12,7 @@ function PostsComponent() {
     queryFn: fetchPosts,
     staleTime: 1000 * 60, // 1 minute fresh
     gcTime: 1000 * 60 * 5, // 5 minutes cache (v5: gcTime replaces cacheTime)
+    keepPreviousData: true, // keep previous data while refetching
     refetchOnWindowFocus: true,
   })
 
