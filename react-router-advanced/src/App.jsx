@@ -67,6 +67,15 @@ function Post() {
   )
 }
 
+function BlogPost() {
+  const { id } = useParams()
+  return (
+    <div>
+      <h2>BlogPost {id}</h2>
+    </div>
+  )
+}
+
 function NotFound() {
   return <h2>Not Found</h2>
 }
@@ -84,6 +93,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
           <Route path="posts/:postId" element={<Post />} />
+          <Route path="/blog/:id" element={<BlogPost />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="profile" element={<Profile />}>
