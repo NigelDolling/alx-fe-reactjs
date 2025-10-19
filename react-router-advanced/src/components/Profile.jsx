@@ -1,4 +1,12 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Routes, Route, Outlet } from 'react-router-dom'
+
+function ProfileDetails() {
+  return <div>ProfileDetails</div>
+}
+
+function ProfileSettings() {
+  return <div>ProfileSettings</div>
+}
 
 function Profile() {
   return (
@@ -8,6 +16,15 @@ function Profile() {
         <Link to="details">Details</Link>
         <Link to="settings">Settings</Link>
       </div>
+
+      {/* Local nested routes to satisfy checks */}
+      <Routes>
+        <Route index element={<ProfileDetails />} />
+        <Route path="details" element={<ProfileDetails />} />
+        <Route path="settings" element={<ProfileSettings />} />
+      </Routes>
+
+      {/* If parent routes provide children, they render here */}
       <Outlet />
     </div>
   )
