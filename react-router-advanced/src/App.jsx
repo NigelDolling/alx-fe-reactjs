@@ -1,5 +1,5 @@
 import { useState, createContext, useContext } from 'react'
-import { Routes, Route, Link, Navigate, Outlet, useParams } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link, Navigate, Outlet, useParams } from 'react-router-dom'
 import './App.css'
 
 const AuthContext = createContext(null)
@@ -78,7 +78,8 @@ function App() {
 
   return (
     <AuthContext.Provider value={authValue}>
-      <Routes>
+      <BrowserRouter>
+        <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
@@ -94,7 +95,8 @@ function App() {
 
           <Route path="*" element={<NotFound />} />
         </Route>
-      </Routes>
+        </Routes>
+      </BrowserRouter>
     </AuthContext.Provider>
   )
 }
